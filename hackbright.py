@@ -48,13 +48,27 @@ def get_project_by_title(title):
 
 def get_grade_by_github_title(github, title):
     """Print grade student received for a project."""
-    pass
+    QUERY = """SELECT grade FROM Grades WHERE student_github = ? AND 
+    project_title = ?"""
+    db_cursor.execute(QUERY, (github, title))
+    row = db_cursor.fetchone()
+    print "Grade: %d" %(row[0])
 
 
 def assign_grade(github, title, grade):
     """Assign a student a grade on an assignment and print a confirmation."""
-    pass
+    QUERY = """INSERT INTO Grades VALUES(?,?,?)"""
+    db_cursor.execute(QUERY, (github, title, grade))
+    db_connection.commit()
+    print "Success! %s received a grade of %s on the %s project!" % (github, grade, title)
 
+def add_new_project(title, description, max_grade):
+    """Add a new project with a Project Title, Description, and Max Grade"""
+    QUERY = """INSERT into Projects (title, description, max_grade) VALUES(?,?,?)"""
+    db_cursor.execute(QUERY, (title, description, max_grade))
+    db_connection.commit()
+    print "Success! Add %s project, and here is the description: %s, and max grade: %s"\
+    %(title, description, max_grade)
 
 def handle_input():
     """Main loop.
@@ -75,20 +89,32 @@ def handle_input():
             get_student_by_github(github)
 
         elif command == "new_student":
-            # QUERY = """SELECT first_name, last_name, github 
-            # FROM Students
-            # WHERE github = ?
-            # """
             first_name, last_name, github = args   # unpack!
             make_new_student(first_name, last_name, github)
 
         elif command == "project":
-            # QUERY = """SELECT first_name, last_name, github 
-            # FROM Students
-            # WHERE github = ?
-            # """
             title = args[0]   # unpack!
             get_project_by_title(title)
+
+        elif command == "grade":
+            github = args[0]
+            title = args[1]
+            get_grade_by_github_title(github, title)
+
+        elif command == "update_grade":
+            github, title, grade = args
+            assign_grade(github, title, grade)
+
+        elif command == "new_project":
+            title = args[0]
+            description = " ".join(args[1:-1])
+            max_grade = int(args[-1])
+            print title
+            print description
+            print max_grade
+            add_new_project(title, description, max_grade)
+
+
 
             
 
