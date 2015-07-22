@@ -70,6 +70,18 @@ def add_new_project(title, description, max_grade):
     print "Success! Add %s project, and here is the description: %s, and max grade: %s"\
     %(title, description, max_grade)
 
+def get_all_grades(first_name, last_name):
+    """Shows the grades of each project for the student"""
+    QUERY = """ SELECT s.first_name, s.last_name, g.project_title, g.grade 
+    FROM Students AS s 
+    INNER JOIN Grades AS g ON s.github = g.student_github
+    WHERE s.first_name = ? AND s.last_name = ? """
+    db_cursor.execute(QUERY, (first_name, last_name))
+    grades_data = db_cursor.fetchone()
+    print grades_data[-1]
+
+
+
 def handle_input():
     """Main loop.
 
@@ -109,10 +121,12 @@ def handle_input():
             title = args[0]
             description = " ".join(args[1:-1])
             max_grade = int(args[-1])
-            print title
-            print description
-            print max_grade
             add_new_project(title, description, max_grade)
+        elif command == "get_all_grades":
+            first_name = args[0]
+            last_name = args[1]
+            get_all_grades(first_name, last_name)
+
 
 
 
